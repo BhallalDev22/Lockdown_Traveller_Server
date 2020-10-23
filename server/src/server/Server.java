@@ -30,8 +30,8 @@ public class Server {
             Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
         }
 }
-    static ServerSocket soc,soc2,soc3;
-    static DataOutputStream dout,dout2,dout3;
+    static ServerSocket soc,soc2,soc3,soc4;
+    static DataOutputStream dout,dout2,dout3,dout4;
     static DataInputStream din,din2,din3;
     /**
      * @param args the command line arguments
@@ -41,6 +41,7 @@ public class Server {
        th1.start();
         th2.start();
         th3.start();
+        th4.start();
         //System.out.println("done");
     }
     static Thread th1 = new Thread(new Runnable() {
@@ -111,6 +112,28 @@ public class Server {
                 }
             }
         });
+        static Thread th4 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    soc4=new ServerSocket(9040);
+                } catch (IOException ex) {
+                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                while(true){
+                    try {
+                        
+                        Socket s3=soc4.accept();
+                        System.out.println("done1");
+                        handle4(s3);
+                    } catch (IOException ex) {
+                        Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (SQLException ex) {
+                        Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        });
 
     public static void handle(Socket s1) throws IOException, ClassNotFoundException, SQLException{
         din=new DataInputStream(s1.getInputStream());
@@ -131,7 +154,7 @@ public class Server {
            dout.writeUTF("-1");
         }
         else {
-            //System.out.println(rs.getInt(0)+"");
+            
             dout.writeUTF("1234");
         }
         conn.close();
@@ -166,6 +189,21 @@ public class Server {
         System.out.println(st);
         stmt=conn.createStatement();
         int rs=stmt.executeUpdate(st);
+        conn.close();
+    }
+    public static void handle4(Socket s1) throws IOException, SQLException{
+        dout4=new DataOutputStream(s1.getOutputStream());
+        Connection conn = DriverManager.getConnection("jdbc:mysql://192.168.64.2/test","root","root");
+        Statement stmt;
+        stmt=conn.createStatement();
+        System.out.println("done1");
+        ResultSet rs=stmt.executeQuery("select * from stations");
+        System.out.println("done1");
+        while(rs.next()){
+            dout4.writeUTF(rs.getString("sname")+"-"+rs.getString("scode"));
+        }
+        dout4.writeUTF("-1");
+        System.out.println("done1");
         conn.close();
     }
 }
