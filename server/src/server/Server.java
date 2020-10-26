@@ -26,13 +26,20 @@ public class Server {
     static{
         try {
             Class.forName("com.mysql.jdbc.Driver");
+            //Connection conn = DriverManager.getConnection("jdbc:mysql://192.168.64.2/test","root","root");
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
         }
 }
-    static ServerSocket soc,soc2,soc3,soc4;
-    static DataOutputStream dout,dout2,dout3,dout4;
-    static DataInputStream din,din2,din3;
+    public Server() throws SQLException{
+       
+        Connection conn = DriverManager.getConnection("jdbc:mysql://192.168.64.2/test","root","root");
+    }
+    
+
+    static ServerSocket soc,soc2,soc3,soc4,soc5,soc6;
+    static DataOutputStream dout,dout2,dout3,dout4,dout5,dout6;
+    static DataInputStream din,din2,din3,din5,din6;
     /**
      * @param args the command line arguments
      */
@@ -42,13 +49,15 @@ public class Server {
         th2.start();
         th3.start();
         th4.start();
+        th5.start();
+        th6.start();
         //System.out.println("done");
     }
     static Thread th1 = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    soc=new ServerSocket(5000);
+                    soc=new ServerSocket(9000);
                 } catch (IOException ex) {
                     Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -134,14 +143,56 @@ public class Server {
                 }
             }
         });
+        static Thread th5 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    soc5=new ServerSocket(9050);
+                } catch (IOException ex) {
+                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                while(true){
+                    try {
+                        
+                        Socket s5=soc5.accept();
+                        System.out.println("done1");
+                        handle5(s5);
+                    } catch (IOException ex) {
+                        Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (SQLException ex) {
+                        Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        });
+        static Thread th6 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    soc6=new ServerSocket(9060);
+                } catch (IOException ex) {
+                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                while(true){
+                    try {
+                        
+                        Socket s6=soc6.accept();
+                        System.out.println("done1");
+                        handle6(s6);
+                    } catch (IOException ex) {
+                        Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (SQLException ex) {
+                        Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        });
 
     public static void handle(Socket s1) throws IOException, ClassNotFoundException, SQLException{
         din=new DataInputStream(s1.getInputStream());
         dout=new DataOutputStream(s1.getOutputStream());
-        //System.out.println("done2");
-         
-         //System.out.println("done2");
-        Connection conn = DriverManager.getConnection("jdbc:mysql://192.168.64.2/test","root","root");
+        
+       Connection conn = DriverManager.getConnection("jdbc:mysql://192.168.64.2/test","root","root");
         Statement stmt;
         String s2;
         System.out.println("done2");
@@ -150,13 +201,21 @@ public class Server {
         System.out.println(s2);
         stmt=conn.createStatement();
         ResultSet rs=stmt.executeQuery("select * from users where username='"+s2+"'");
+        System.out.println(s2);
+        //System.out.println(rs.getString("ammount"));
         if(!rs.isBeforeFirst()){
            dout.writeUTF("-1");
         }
         else {
-            
-            dout.writeUTF("1234");
+            System.out.println("start...");
+            while(rs.next()){
+            dout.writeUTF(rs.getString("ammount"));
+            dout.writeUTF(rs.getString(2));
+            //dout.writeUTF(rs.getString(4));
+            //dout.writeUTF(rs.getString(3));
+            }System.out.println("end....");
         }
+        System.out.println(s2);
         conn.close();
     }
     public static void handle2(Socket s) throws IOException, ClassNotFoundException, SQLException{
@@ -204,6 +263,47 @@ public class Server {
         }
         dout4.writeUTF("-1");
         System.out.println("done1");
+        conn.close();
+    }
+    public static void handle5(Socket s5) throws IOException, SQLException{
+        dout5=new DataOutputStream(s5.getOutputStream());
+        din5=new DataInputStream(s5.getInputStream());
+        Connection conn = DriverManager.getConnection("jdbc:mysql://192.168.64.2/test","root","root");
+        System.out.println("done1");
+        Statement stmt;
+        String us=din5.readUTF();
+        System.out.println(us);
+        stmt=conn.createStatement();
+        System.out.println("done1");
+        ResultSet rs=stmt.executeQuery("select * from users where username = '"+us+"'");
+        System.out.println("done1");
+        while(rs.next()){
+            System.out.println("done1");
+            dout5.writeUTF(rs.getString(2));
+            System.out.println(rs.getString(2));
+            dout5.writeUTF(rs.getString(3));
+            System.out.println(rs.getString(3));
+            dout5.writeUTF(rs.getString(4));
+            System.out.println(rs.getString(4));
+        }
+        conn.close();
+    }
+    public static void handle6(Socket s6) throws IOException, SQLException{
+        dout6=new DataOutputStream(s6.getOutputStream());
+        din6=new DataInputStream(s6.getInputStream());
+        Connection conn = DriverManager.getConnection("jdbc:mysql://192.168.64.2/test","root","root");
+        String sql=din6.readUTF();
+        Statement stmt;
+        stmt=conn.createStatement();
+        ResultSet rs=stmt.executeQuery(sql);
+        while(rs.next()){
+            dout6.writeUTF(rs.getString(1));
+            dout6.writeUTF(rs.getString(2));
+            dout6.writeUTF(rs.getString(13));
+            dout6.writeUTF(rs.getString(14));
+            dout6.writeUTF(rs.getString(15));
+        }
+        dout6.writeUTF("-1");
         conn.close();
     }
 }
