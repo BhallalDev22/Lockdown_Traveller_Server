@@ -191,15 +191,24 @@ public class Server {
     public static void handle(Socket s1) throws IOException, ClassNotFoundException, SQLException{
         din=new DataInputStream(s1.getInputStream());
         dout=new DataOutputStream(s1.getOutputStream());
+<<<<<<< HEAD
         
        Connection conn = DriverManager.getConnection("jdbc:mysql://192.168.64.2/test","root","root");
+=======
+        //System.out.println("done2");
+         
+         //System.out.println("done2");
+        Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/login_signup?zeroDateTimeBehavior=convertToNull","root","");
+>>>>>>> b92afc1a4c646dca40c749ffc46aebe964a667fb
         Statement stmt;
         String s2;
         System.out.println("done2");
         s2=din.readUTF();
+        
         System.out.println("done2");
         System.out.println(s2);
         stmt=conn.createStatement();
+<<<<<<< HEAD
         ResultSet rs=stmt.executeQuery("select * from users where username='"+s2+"'");
         System.out.println(s2);
         //System.out.println(rs.getString("ammount"));
@@ -217,12 +226,37 @@ public class Server {
         }
         System.out.println(s2);
         conn.close();
+=======
+        ResultSet rs=stmt.executeQuery("select * from users where username='"+s2+"' ");
+//       while(rs.next())
+//       {
+//            System.out.println(rs.getString("password"));
+//       }
+       rs.next();
+       dout.writeUTF(rs.getString("password"));
+       dout.flush(); 
+//   System.out.println(rs.getString("password"));
+//       dout.writeUTF(rs.getString("password"));
+//        dout.flush();
+//        if(!rs.isBeforeFirst()){
+//           dout.writeUTF("-1");
+//           dout.flush();
+//            System.out.println("-1 returned by server");
+//        }
+//        else {
+//            
+//            dout.writeUTF(rs.getString("password"));
+//            dout.flush();
+//            System.out.println("password returned");
+//        }
+       // conn.close();
+>>>>>>> b92afc1a4c646dca40c749ffc46aebe964a667fb
     }
     public static void handle2(Socket s) throws IOException, ClassNotFoundException, SQLException{
         din2=new DataInputStream(s.getInputStream());
         dout2=new DataOutputStream(s.getOutputStream());
         
-        Connection conn = DriverManager.getConnection("jdbc:mysql://192.168.64.2/test","root","root");
+        Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/login_signup?zeroDateTimeBehavior=convertToNull","root","");
         Statement stmt;
         String s2;
         s2=din2.readUTF();
@@ -241,7 +275,7 @@ public class Server {
         din3=new DataInputStream(soc3.getInputStream());
         dout3=new DataOutputStream(soc3.getOutputStream());
         System.out.println("done");
-        Connection conn = DriverManager.getConnection("jdbc:mysql://192.168.64.2/test","root","root");
+        Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/login_signup?zeroDateTimeBehavior=convertToNull","root","");
         Statement stmt;
         String st;
         st=din3.readUTF();
@@ -252,7 +286,7 @@ public class Server {
     }
     public static void handle4(Socket s1) throws IOException, SQLException{
         dout4=new DataOutputStream(s1.getOutputStream());
-        Connection conn = DriverManager.getConnection("jdbc:mysql://192.168.64.2/test","root","root");
+        Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/login_signup?zeroDateTimeBehavior=convertToNull","root","");
         Statement stmt;
         stmt=conn.createStatement();
         System.out.println("done1");
